@@ -4,26 +4,24 @@
     <div class="pageContent">
       <a-button class="addSectionBtn" type="link"> Add new section </a-button>
       <!-- <HelloWorld msg="Welcome to Jira Clone" /> -->
-      <div
+      <draggable
+        v-model="sectionCount"
+        group="people"
+        @start="drag = true"
+        @end="drag = false"
         class="sections droptarget"
-        v-on:drop="drop"
-        v-on:dragover="allowDrop"
       >
         <div
-          v-for="item in sectionCount"
-          :key="item.section"
-          :id="item.section"
-          v-on:dragstart="drag"
-          draggable="true"
+          v-for="element in sectionCount"
+          :key="element.id"
           class="outSection"
         >
           <SectionComponent
-            :count="sectionCount"
-            :id="item.section"
+            :count="element"
+            :id="element.index"
           ></SectionComponent>
         </div>
-        <!-- <div draggable="true" id="drag2" v-on:dragstart="drag">nil</div> -->
-      </div>
+      </draggable>
     </div>
   </div>
 </template>
@@ -31,38 +29,79 @@
 <script>
 // @ is an alias to /src
 import SectionComponent from "@/components/SectionComponent.vue";
-
+import draggable from "vuedraggable";
 export default {
   name: "HomeView",
+
   components: {
     //HelloWorld,
     SectionComponent,
+    draggable,
   },
 
   data() {
     return {
       sectionCount: [
-        { section: "section1" },
-        { section: "section2" },
-        { section: "section3" },
+        {
+          section: "section1",
+          sectionName: "To do",
+          index: 1,
+          items: [
+            {
+              title: "item 1",
+            },
+          ],
+        },
+        {
+          section: "section2",
+          sectionName: "Doing",
+          index: 2,
+          items: [
+            {
+              title: "item 2",
+            },
+            {
+              title: "item 3",
+            },
+          ],
+        },
+        {
+          section: "section3",
+          sectionName: "Done",
+          index: 3,
+          items: [
+            {
+              title: "item 1",
+            },
+          ],
+        },
       ],
       items: [{ message: "Foo" }, { message: "Bar" }],
+      enabled: true,
+      rows: [
+        {
+          index: 1,
+          items: [
+            {
+              title: "item 1",
+            },
+          ],
+        },
+        {
+          index: 2,
+          items: [
+            {
+              title: "item 2",
+            },
+            {
+              title: "item 3",
+            },
+          ],
+        },
+      ],
     };
   },
-  methods: {
-    allowDrop(event) {
-      event.preventDefault();
-    },
-    drop(event) {
-      event.preventDefault();
-      var data = event.dataTransfer.getData("Text");
-      event.target.appendChild(document.getElementById(data));
-      //document.getElementById("demo").innerHTML = "The p element was dropped";
-    },
-    drag(event) {
-      event.dataTransfer.setData("Text", event.target.id);
-    },
-  },
+  methods: {},
 };
 </script>
 
@@ -88,7 +127,7 @@ export default {
       height: 819px;
       display: flex;
       justify-content: space-between;
-      border: 1px solid yellow;
+      //border: 1px solid yellow;
 
       .outSection {
         display: flex;
@@ -96,5 +135,15 @@ export default {
       }
     }
   }
+}
+
+.row-v {
+  height: 150px;
+  width: 200px;
+}
+
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
 }
 </style>
