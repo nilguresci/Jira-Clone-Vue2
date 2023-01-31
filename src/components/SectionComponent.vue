@@ -1,23 +1,29 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <template>
   <div class="section" :id="id">
     <div class="sectionHeader">
-      <div class="sectionName">{{ count.sectionName }}</div>
-      <a-button>Add task</a-button>
+      <input
+        class="sectionName"
+        @change="updateSectionName(section.id)"
+        v-model="section.sectionName"
+      />
+
+      <a-button @click="addTask(section.id)">Add task</a-button>
     </div>
     <draggable
-      v-model="tasks"
-      group="people"
+      v-model="butasks"
+      group="task"
       @start="drag = true"
       @end="drag = false"
       class="tasks"
     >
       <TaskComponent
-        v-for="item in tasks"
+        v-for="item in butasks"
         :key="item.id"
         :id="item.id"
         :title="item.taskTitle"
         :task="item"
-        :sectionName="count.sectionName"
+        :sectionName="section.sectionName"
       ></TaskComponent>
     </draggable>
   </div>
@@ -31,7 +37,7 @@ import draggable from "vuedraggable";
 export default {
   name: "SectionComponent",
   props: {
-    count: String,
+    section: Object,
     id: String,
   },
   components: {
@@ -68,25 +74,93 @@ export default {
         },
       ],
       tasks: [],
+      butasks: [],
+      defaultTask: {},
+      //updateSectionName: "",
     };
   },
-  mounted() {
+  async mounted() {
     const $this = this;
-    this.getTasks();
+    $this.$store.dispatch("setTasks");
+
+    //this.updateSectionName = this.section.sectionName
     $this.$store.watch(
       () => [store.state.tasks],
       async () => {
         this.tasks = store.state.tasks;
         console.log("mounted", this.tasks);
+        const tasks = $this.$store.state.tasks;
+        this.butasks = tasks.filter(
+          (task) => task.sectionId === this.section.id
+        );
+        console.log("butaks", this.butasks);
       }
     );
   },
   methods: {
-    getTasks() {
+    async getTasks() {
       const $this = this;
-      $this.$store.dispatch("setTasks").then(() => {
-        this.tasks = store.state.tasks;
+      console.log("gettask başladı");
+      await $this.$store.dispatch("setTasks").then(async () => {
+        this.tasks = await store.state.tasks;
+        this.butasks = await this.tasks.filter(
+          (task) => task.sectionId === this.section.id
+        );
+        console.log("butaks", this.butasks);
       });
+    },
+    addTask(sectionId) {
+      const $this = this;
+      console.log("tık");
+      let taskData = {
+        taskTitle: "My new task",
+        //taskContent: "perferendis",
+        links: ["https://github.com", "https://v2.vuejs.org/"],
+        tags: ["design", "development"],
+        comments: [
+          {
+            id: "1",
+            text: "comment comment comment comment",
+          },
+          {
+            id: "2",
+            text: "comment comment comment comment",
+          },
+        ],
+        collaborators: [
+          {
+            userId: "1",
+            userImage: "",
+          },
+          {
+            userId: "2",
+            userImage: "",
+          },
+        ],
+        sectionId: sectionId,
+      };
+      $this.$store.dispatch({
+        type: "setNewTask",
+        taskData: taskData,
+      });
+    },
+    updateSectionName(sectionId) {
+      const $this = this;
+      console.log("tık", sectionId);
+      console.log("section name model", this.section.sectionName);
+      let updateData = {
+        id: sectionId,
+        sectionName: this.section.sectionName,
+      };
+      let timeoutId;
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(function () {
+        // Runs 1 second (1000 ms) after the last change
+        $this.$store.dispatch({
+          type: "setUpdateSectionName",
+          updateData: updateData,
+        });
+      }, 1000);
     },
   },
 };
@@ -95,6 +169,8 @@ export default {
 <style lang="scss">
 .section {
   width: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   //border: 1px solid blue;
   .sectionHeader {
@@ -103,6 +179,9 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    .sectionName:focus {
+      outline: none;
+    }
   }
 }
 

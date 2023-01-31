@@ -2,24 +2,19 @@
   <div class="home">
     <div class="left">left</div>
     <div class="pageContent">
-      <a-button class="addSectionBtn" type="link"> Add new section </a-button>
+      <a-button class="addSectionBtn" type="link" @click="addSection()">
+        Add new section
+      </a-button>
       <!-- <HelloWorld msg="Welcome to Jira Clone" /> -->
       <draggable
-        v-model="sectionCount"
-        group="people"
+        v-model="sections"
+        group="section"
         @start="drag = true"
         @end="drag = false"
         class="sections droptarget"
       >
-        <div
-          v-for="element in sectionCount"
-          :key="element.id"
-          class="outSection"
-        >
-          <SectionComponent
-            :count="element"
-            :id="element.index"
-          ></SectionComponent>
+        <div v-for="sec in sections" :key="sec.id" class="outSection">
+          <SectionComponent :section="sec" :id="sec.id"></SectionComponent>
         </div>
       </draggable>
     </div>
@@ -30,15 +25,14 @@
 // @ is an alias to /src
 import SectionComponent from "@/components/SectionComponent.vue";
 import draggable from "vuedraggable";
+import store from "@/store";
 export default {
   name: "HomeView",
-
   components: {
     //HelloWorld,
     SectionComponent,
     draggable,
   },
-
   data() {
     return {
       sectionCount: [
@@ -99,9 +93,35 @@ export default {
           ],
         },
       ],
+      sections: [],
     };
   },
-  methods: {},
+  mounted() {
+    const $this = this;
+    this.getSections();
+    $this.$store.watch(
+      () => [store.state.sections],
+      async () => {
+        this.sections = store.state.sections;
+        console.log("mounted sections", this.sections);
+      }
+    );
+  },
+  methods: {
+    getSections() {
+      const $this = this;
+      $this.$store.dispatch("setSections").then(() => {
+        this.sections = store.state.sections;
+      });
+    },
+    addSection() {
+      const $this = this;
+      console.log("tık");
+      $this.$store.dispatch({
+        type: "setNewSection",
+      });
+    },
+  },
 };
 </script>
 
@@ -123,15 +143,18 @@ export default {
       color: #667085;
     }
     .sections {
-      width: 1032px;
+      width: 1045px;
       height: 819px;
       display: flex;
       justify-content: space-between;
+      overflow-x: auto;
+      overflow-y: hidden;
       //border: 1px solid yellow;
 
       .outSection {
         display: flex;
         justify-content: space-between;
+        margin: 0 20px 0 0px;
       }
     }
   }

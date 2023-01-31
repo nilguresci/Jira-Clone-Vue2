@@ -9,7 +9,9 @@
 
         <p class="creatorName">{{ task.creatorName }}</p>
       </div>
-      <p class="cardText">{{ task.taskContent }}</p>
+      <p class="cardText" :id="task.id + 'cardText'">
+        {{ task.taskContent }}
+      </p>
       <img
         v-if="task.taskImage"
         slot="cover"
@@ -75,7 +77,11 @@
           <div class="commentCount">{{ task.comments.length }}</div>
         </div>
         <div class="persons">
-          <div class="person">
+          <div
+            class="person"
+            v-for="person in task.collaborators"
+            :key="person"
+          >
             <img src="../../public/user-image2.jpg" alt="" />
           </div>
         </div>
@@ -86,6 +92,7 @@
 
 <script>
 import moment from "moment";
+import $ from "jquery";
 export default {
   name: "TaskComponent",
   props: {
@@ -101,9 +108,16 @@ export default {
   },
   mounted() {
     console.log(this.title);
-    this.createdDate = moment(this.task.createdDate).format("MMM Do YY");
+    this.createdDate = moment(this.task.createdDate).format("MMM Do");
   },
-  methods: {},
+  methods: {
+    showContent(id) {
+      $(`#${id}cardText`).css("white-space", "initial");
+    },
+    hideContent(id) {
+      $(`#${id}cardText`).css("white-space", "pre");
+    },
+  },
 };
 </script>
 
@@ -235,7 +249,9 @@ export default {
     }
 
     .persons {
+      display: flex;
       .person {
+        margin: 0 3px 0 3px;
         img {
           border-radius: 50%;
           width: 25px;
