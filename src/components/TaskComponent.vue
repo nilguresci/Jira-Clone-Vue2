@@ -1,7 +1,7 @@
 <template>
   <div class="task">
-    <a-card style="width: 280px">
-      <div class="cardHeader">{{ title }} {{ sectionName }}</div>
+    <a-card style="width: 280px" name="taskCard">
+      <div class="cardHeader">{{ title }}</div>
       <div class="cardInfo">
         <p>{{ createdDate }}</p>
         <div class="dot">~</div>
@@ -19,7 +19,7 @@
         :src="task.taskImage"
       />
       <div class="links">
-        <div class="d-flex link" v-for="link in task.links" :key="link">
+        <div class="d-flex link" v-for="(link, idx) in task.links" :key="idx">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -53,7 +53,12 @@
       </div>
 
       <div class="tags">
-        <a-tag class="tag greenTag" v-for="tag in task.tags" :key="tag">
+        <a-tag
+          class="tag greenTag"
+          name="tags"
+          v-for="(tag, idx) in task.tags"
+          :key="idx"
+        >
           {{ tag }}
         </a-tag>
         <!-- <a-tag class="tag grayTag"> green </a-tag> -->
@@ -79,8 +84,8 @@
         <div class="persons">
           <div
             class="person"
-            v-for="person in task.collaborators"
-            :key="person"
+            v-for="(person, idx) in task.collaborators"
+            :key="idx"
           >
             <img src="../../public/user-image2.jpg" alt="" />
           </div>
@@ -96,10 +101,10 @@ import $ from "jquery";
 export default {
   name: "TaskComponent",
   props: {
-    //msg: String,
     title: String,
     sectionName: String,
     task: Object,
+    sectionId: String,
   },
   data() {
     return {
@@ -110,6 +115,25 @@ export default {
     console.log(this.title);
     this.createdDate = moment(this.task.createdDate).format("MMM Do");
   },
+  watch: {
+    task() {
+      console.log("task sec id", this.task.sectionId);
+      console.log(" sec name", this.sectionName);
+      console.log("section id", this.sectionId);
+      if (this.task.sectionId === this.sectionId) {
+        return;
+      } else {
+        console.log("section id yi değiştir");
+        // eslint-disable-next-line vue/no-mutating-props
+        this.task.sectionId = this.sectionId;
+        this.$store.dispatch({
+          type: "setUpdateSectionIdTask",
+          updateTask: this.task,
+        });
+      }
+    },
+  },
+
   methods: {
     showContent(id) {
       $(`#${id}cardText`).css("white-space", "initial");
@@ -214,10 +238,10 @@ export default {
       margin-right: 10px;
     }
     .greenTag {
-      border-color: aqua;
-      background-color: aquamarine;
+      border: none;
+      background-color: #d1fadf;
       border-radius: 8px;
-      color: green;
+      color: #12b76a;
       padding: 5px 7px 5px 7px;
     }
     .grayTag {
@@ -257,9 +281,6 @@ export default {
           width: 25px;
           height: 25px;
         }
-        // background-color: red;
-
-        // background-image: url("../../public/user-image2.jpg");
       }
     }
   }

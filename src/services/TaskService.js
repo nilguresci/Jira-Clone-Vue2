@@ -18,14 +18,14 @@ const addNewSection = async (sectionData) => {
   const result = await axios
     .post(apiUrl + "/sections", sectionData)
     .then((res) => {
-      console.log("res", res);
+      return res;
     });
   return result;
 };
 
 const addTask = async (taskData) => {
   const result = await axios.post(apiUrl + "/tasks", taskData).then((res) => {
-    console.log("new task", res);
+    return res;
   });
   return result;
 };
@@ -34,7 +34,16 @@ const updateSectionName = async (updateData, id) => {
   const result = await axios
     .put(apiUrl + "/sections/" + id, updateData)
     .then((res) => {
-      console.log("updated data", res);
+      return res;
+    });
+  return result;
+};
+
+const updateSectionIdTask = async (task, taskId) => {
+  const result = await axios
+    .put(apiUrl + "/tasks/" + taskId, task)
+    .then((res) => {
+      console.log("updated task", res);
     });
   return result;
 };
@@ -45,6 +54,7 @@ export const taskService = {
   addNewSection,
   addTask,
   updateSectionName,
+  updateSectionIdTask,
 };
 
 export default taskService;

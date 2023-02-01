@@ -20,12 +20,9 @@ export default new Vuex.Store({
   getters: {},
   mutations: {
     getTasks(state, payload) {
-      console.log(payload);
       state.tasks = payload.data;
-      console.log("tasks", state.tasks);
     },
     getSections(state, payload) {
-      console.log("sects", payload.data);
       state.sections = payload.data;
     },
     getNewSectionInfo(state, payload) {
@@ -73,7 +70,6 @@ export default new Vuex.Store({
     },
     setNewTask({ dispatch }, taskData) {
       const newTaskData = taskData.taskData;
-      //console.log("new data giden", newTaskData);
       taskService
         .addTask(newTaskData)
         .then(() => {
@@ -89,6 +85,17 @@ export default new Vuex.Store({
         .updateSectionName(sendData, sendData.id)
         .then(() => {
           dispatch("setSections");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    setUpdateSectionIdTask({ dispatch }, data) {
+      let sendData = data.updateTask;
+      taskService
+        .updateSectionIdTask(sendData, sendData.id)
+        .then(() => {
+          dispatch("setTasks"); //task in section id'si güncellenince tasklerde güncelleniyor
         })
         .catch((err) => {
           console.log(err);

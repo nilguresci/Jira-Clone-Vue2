@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <div class="section" :id="id">
+  <div class="section scroll" :id="id">
     <div class="sectionHeader">
       <input
         class="sectionName"
@@ -8,7 +8,13 @@
         v-model="section.sectionName"
       />
 
-      <a-button @click="addTask(section.id)">Add task</a-button>
+      <a-button
+        name="addTaskBtn"
+        class="addTaskBtn"
+        type="link"
+        @click="addTask(section.id)"
+        >Add task</a-button
+      >
     </div>
     <draggable
       v-model="butasks"
@@ -18,12 +24,13 @@
       class="tasks"
     >
       <TaskComponent
-        v-for="item in butasks"
-        :key="item.id"
+        v-for="(item, idx) in butasks"
+        :key="idx"
         :id="item.id"
         :title="item.taskTitle"
         :task="item"
         :sectionName="section.sectionName"
+        :sectionId="section.id"
       ></TaskComponent>
     </draggable>
   </div>
@@ -117,6 +124,7 @@ export default {
         //taskContent: "perferendis",
         links: ["https://github.com", "https://v2.vuejs.org/"],
         tags: ["design", "development"],
+        taskImage: "",
         comments: [
           {
             id: "1",
@@ -179,8 +187,19 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    .sectionName {
+      font-weight: 600;
+      color: #667085;
+      font-size: 13px;
+    }
     .sectionName:focus {
       outline: none;
+    }
+
+    .addTaskBtn {
+      :hover {
+        color: #101828 !important;
+      }
     }
   }
 }

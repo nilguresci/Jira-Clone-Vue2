@@ -1,11 +1,12 @@
 <template>
   <div class="home">
-    <div class="left">left</div>
+    <aside class="left">
+      <LeftSideComponent></LeftSideComponent>
+    </aside>
     <div class="pageContent">
       <a-button class="addSectionBtn" type="link" @click="addSection()">
         Add new section
       </a-button>
-      <!-- <HelloWorld msg="Welcome to Jira Clone" /> -->
       <draggable
         v-model="sections"
         group="section"
@@ -13,7 +14,7 @@
         @end="drag = false"
         class="sections droptarget"
       >
-        <div v-for="sec in sections" :key="sec.id" class="outSection">
+        <div v-for="(sec, idx) in sections" :key="idx" class="outSection">
           <SectionComponent :section="sec" :id="sec.id"></SectionComponent>
         </div>
       </draggable>
@@ -22,77 +23,19 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import SectionComponent from "@/components/SectionComponent.vue";
+import LeftSideComponent from "@/components/LeftSideComponent.vue";
 import draggable from "vuedraggable";
 import store from "@/store";
 export default {
   name: "HomeView",
   components: {
-    //HelloWorld,
     SectionComponent,
     draggable,
+    LeftSideComponent,
   },
   data() {
     return {
-      sectionCount: [
-        {
-          section: "section1",
-          sectionName: "To do",
-          index: 1,
-          items: [
-            {
-              title: "item 1",
-            },
-          ],
-        },
-        {
-          section: "section2",
-          sectionName: "Doing",
-          index: 2,
-          items: [
-            {
-              title: "item 2",
-            },
-            {
-              title: "item 3",
-            },
-          ],
-        },
-        {
-          section: "section3",
-          sectionName: "Done",
-          index: 3,
-          items: [
-            {
-              title: "item 1",
-            },
-          ],
-        },
-      ],
-      items: [{ message: "Foo" }, { message: "Bar" }],
-      enabled: true,
-      rows: [
-        {
-          index: 1,
-          items: [
-            {
-              title: "item 1",
-            },
-          ],
-        },
-        {
-          index: 2,
-          items: [
-            {
-              title: "item 2",
-            },
-            {
-              title: "item 3",
-            },
-          ],
-        },
-      ],
       sections: [],
     };
   },
@@ -103,7 +46,6 @@ export default {
       () => [store.state.sections],
       async () => {
         this.sections = store.state.sections;
-        console.log("mounted sections", this.sections);
       }
     );
   },
@@ -116,7 +58,6 @@ export default {
     },
     addSection() {
       const $this = this;
-      console.log("tık");
       $this.$store.dispatch({
         type: "setNewSection",
       });
@@ -129,10 +70,14 @@ export default {
 .home {
   display: flex;
   .left {
-    width: 320px;
+    width: 21%;
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+    left: 0;
   }
   .pageContent {
-    width: 1192px;
+    width: 79%;
     padding: 80px 40px 40px 40px;
     display: flex;
     flex-direction: column;
@@ -141,9 +86,12 @@ export default {
 
     .addSectionBtn {
       color: #667085;
+      margin-left: 9px;
+      font-weight: 600;
+      font-size: 13px;
     }
     .sections {
-      width: 1045px;
+      width: 100%;
       height: 819px;
       display: flex;
       justify-content: space-between;
@@ -159,7 +107,22 @@ export default {
     }
   }
 }
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+}
 
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #f2f4f7;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #e4e7ec;
+  border-radius: 10px;
+}
 .row-v {
   height: 150px;
   width: 200px;
